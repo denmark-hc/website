@@ -1,18 +1,118 @@
+/* Clear, centered site navigation */
+.site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center; /* center the nav contents */
+    padding: 0.35rem 1rem;
+    background: rgba(255, 255, 255, 0.08); /* translucent */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+}
+
+/* Keep brand and links inline and centered as a group */
+.site-nav .brand,
+.site-nav .nav-links {
+    display: inline-flex;
+    align-items: center;
+}
+
+.site-nav .brand {
+    color: #000;
+    font-weight: 700;
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-links a {
+    color: #684343;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Prefer dark-mode friendly tweaks */
+@media (prefers-color-scheme: dark) {
+    .site-nav { background: rgba(0,0,0,0.32); border-bottom-color: rgba(255,255,255,0.06); }
+    .site-nav .brand, .nav-links a { color: #fff; }
+}
+
+/* On small screens keep links hidden for this simple layout; brand stays centered */
+@media (max-width: 600px) {
+    .nav-links { display: none; }
+}
+
+/* Ensure page content is not hidden behind the fixed header */
+main { padding-top: 4.25rem; }
+
 h1 {
-   color: rgb(0, 0, 0);
-   font-size: 2em;
-   text-align: center;
-   text-transform: uppercase;
-   font-style: italic;
-    margin-top: 10%;
+     color: rgb(0, 0, 0);
+     font-size: 2em;
+     text-align: center;
+     text-transform: uppercase;
+     font-style: italic;
+     margin-top: 2rem; /* reduced so content sits nicely under the nav */
 }
 
 .footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    color: rgb(0, 0, 0);
-    text-align: center;
-    font-style: italic;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: rgb(0, 0, 0);
+        text-align: center;
+        font-style: italic;
+}
+
+/* Donation feed styles */
+.donation-feed {
+    max-width: 820px;
+    margin: 1.5rem auto 4rem;
+    background: rgba(255,255,255,0.6);
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.feed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    max-height: 420px;
+    overflow: hidden;
+}
+.donation-item {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    display: block;
+    transition: transform 300ms ease, opacity 300ms ease;
+    opacity: 1;
+}
+.donation-item .donor { font-weight: 700; margin-right: 0.5rem; }
+.donation-item .amount { color: #0a0; font-weight: 700; }
+.donation-item .message { font-style: italic; margin-top: 0.25rem; color: #333; }
+.donation-item .time { font-size: 0.8rem; color: #666; margin-top: 0.25rem; }
+.donation-item.new { transform: translateY(-8px); opacity: 0.0; animation: dropIn 600ms forwards ease; }
+
+@keyframes dropIn {
+    from { transform: translateY(-14px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+.feed-status { text-align: center; color: #444; padding: 0.5rem 0; font-size: 0.95rem; }
+
+@media (prefers-color-scheme: dark) {
+    .donation-feed { background: rgba(0,0,0,0.36); border-color: rgba(255,255,255,0.04); }
+    .donation-item .message, .feed-status { color: #ddd; }
 }
