@@ -1,0 +1,11 @@
+name: Disabled — donations workflow removed
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: No-op
+        run: echo "Donations workflow disabled — site is sponsor-only"

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- HCB token is optional for API v3 if the endpoint is public; this page uses a static donations.json
+        (preferred for Vercel). No token is required for the default static flow. -->
+    <title>sponsor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="site-nav">
+            <a class="brand" href="index.html">denmark hc</a>
+            <ul class="nav-links">
+                <li><a href="sponsor.html">sponsor</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>donations and sponsors</h1>
+
+                        <h1>live <a href="https://hcb.hackclub.com/dk-hackclub/transactions">hcb</a> donations</h1>
+
+                        <!-- Embedded donation widget (hosted by HCB) -->
+
+                                        <section id="donation-feed" class="donation-feed" data-org="dk-hackclub">
+                    <h2 class="visually-hidden">Live donations</h2>
+                    <ul id="feed-list" aria-live="polite" class="feed-list"></ul>
+                    <p id="feed-status" class="feed-status">Connecting…</p>
+                </section>
+
+            <script>
+            (function(){
+                const feedEl = document.getElementById('donation-feed');
+                if(!feedEl) return;
+                const ORG_ID = feedEl.dataset.org || 'dk-hackclub';
+                const STATUS = document.getElementById('feed-status');
+                const LIST = document.getElementById('feed-list');
+                const MAX_ITEMS = 10;
+                let seen = new Set();
+
+                function escapeHtml(s){
+                    return String(s)
+                        .replace(/&/g,'&amp;')
+                        .replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;')
+                        .replace(/"/g,'&quot;')
+                        .replace(/'/g,'&#039;');
+                }
+
+                function formatAmount(amountCents, currency){
+                    // All donations are in USD for this org — always format as USD.
+                    if (amountCents == null) return '—';
+                    const n = Number(amountCents);
+                    if (Number.isNaN(n)) return String(amountCents);
+                    const value = (n/100).toFixed(2);
+                    return `$${value}`;
+                }
+
+                function renderDonation(d){
+                    const li = document.createElement('li');
+                    li.className = 'donation-item new';
+                    const who = (d.donor && d.donor.name) || d.donor_name || d.transaction?.donor?.name || 'Anonymous';
+                    const amount = d.amount_cents ?? d.transaction?.amount_cents ?? d.amount;
+                    const currency = d.currency || d.transaction?.currency || d.transaction?.amount_currency || d.organization?.currency || '';
+                    const msg = d.memo || d.transaction?.memo || '';
+                    const time = d.transaction?.date || d.date || d.created_at || '';
+                    li.innerHTML = `<strong class="donor">${escapeHtml(who)}</strong> <span class="amount">${escapeHtml(formatAmount(amount, currency))}</span>` +
+                                  (msg?`<div class="message">${escapeHtml(msg)}</div>`:'') +
+                                  (time?`<div class="time">${escapeHtml(time)}</div>`:'');
+                    return li;
+                }
+
+                async function fetchDonations(){
+                    try{
+                        const url = `https://hcb.hackclub.com/api/v3/organizations/${encodeURIComponent(ORG_ID)}/donations?per_page=10&page=1`;
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        const data = await res.json();
+                        const items = data?.donations || data?.data || data || [];
+                        STATUS.textContent = '';
+                        let added = 0;
+                        for(const item of items){
+                            const id = item.id || item._id || item.uuid || (item.created_at + '|' + (item.amount||''));
+                            if(seen.has(id)) continue;
+                            seen.add(id);
+                            const li = renderDonation(item);
+                            LIST.insertBefore(li, LIST.firstChild);
+                            added++;
+                            while(LIST.children.length > MAX_ITEMS) LIST.removeChild(LIST.lastChild);
+                        }
+                        setTimeout(()=>{
+                            Array.from(LIST.querySelectorAll('.donation-item.new')).forEach(el=>el.classList.remove('new'));
+                        }, 700);
+                        if(added>0) STATUS.textContent = '';
+                        else if(LIST.children.length===0) STATUS.textContent = 'No donations yet.';
+                    }catch(err){
+                        console.error('donation feed error', err);
+                        STATUS.textContent = 'Unable to fetch donations.';
+                    }
+                }
+
+                fetchDonations();
+                const interval = setInterval(fetchDonations, 15000);
+                window.addEventListener('beforeunload', ()=>clearInterval(interval));
+            })();
+            </script>
+
+</body>
