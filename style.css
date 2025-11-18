@@ -116,3 +116,21 @@ h1 {
     .donation-feed { background: rgba(0,0,0,0.36); border-color: rgba(255,255,255,0.04); }
     .donation-item .message, .feed-status { color: #ddd; }
 }
+
+p {
+    font-size: large;
+    font-style: italic;
+    text-align: center;
+    
+}
+
+.donate {
+    color: #000000;
+    font-style: italic;
+    text-decoration: underline;
+    display: block;
+    /* shrink to content and center horizontally */
+    width: fit-content; /* modern browsers */
+    margin: 0 auto;
+    text-align: center;
+}
